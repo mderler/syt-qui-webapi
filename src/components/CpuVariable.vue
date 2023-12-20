@@ -33,7 +33,7 @@ const save = async () => {
 </script>
 
 <template>
-  <div class="row">
+  <div class="row rounded mt-1 mb-0 p-0">
     <span class="right-distance col">{{ name }}</span>
     <span class="right-distance col">
       <span>Value:</span>
