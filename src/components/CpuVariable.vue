@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 import axios from 'axios'
 import type { VarType } from '@/types/var-type.type'
 
