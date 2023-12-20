@@ -1,28 +1,50 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted } from 'vue'
+import axios from 'axios'
 import type { VarType } from '@/types/var-type.type'
 
-defineProps<{ name: string, varType: VarType }>()
+const props = defineProps<{
+  name: string
+  varType: VarType
+  token: string | null
+  value: boolean | number
+}>()
 
-const varValue = ref<boolean | number>()
+const newValue = ref<boolean | number>(props.varType === 'bool' ? false : 0.0)
 
-const save = () => {
-  fetch("https://192.168.10.62/api/jsonrpc", {body: JSON.stringify({})})
+const save = async () => {
+  if (!props.token) {
+    return
+  }
+  await axios.post(
+    'https://192.168.10.62/api/jsonrpc',
+    {
+      id: 1,
+      jsonrpc: '2.0',
+      method: 'PlcProgram.Write',
+      params: {
+        var: props.name,
+        value: newValue.value
+      }
+    },
+    { headers: { 'X-Auth-Token': props.token } }
+  )
 }
 </script>
 
 <template>
-  <div>
-    <span class="right-distance">{{ name }}</span>
-    <span class="right-distance">
+  <div class="row">
+    <span class="right-distance col">{{ name }}</span>
+    <span class="right-distance col">
       <span>Value:</span>
-      <select v-if="varType === 'bool'" v-model="varValue">
-        <option :value="false">False</option>
-        <option :value="true">True</option>
-      </select>
-      <input type="number" v-else v-model="varValue">
+      <span class="right-distance">{{ props.value }}</span>
     </span>
-    <button @click="save">Save</button>
+    <select class="col" v-if="varType === 'bool'" v-model="newValue">
+      <option :value="false">False</option>
+      <option :value="true">True</option>
+    </select>
+    <input class="col" type="number" v-else v-model="newValue" value="0" />
+    <button class="col" @click="save">Save</button>
   </div>
 </template>
 
